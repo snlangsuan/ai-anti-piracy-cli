@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 
+import fs from 'node:fs'
 import { program } from 'commander'
 import pckg from './../package.json' with { type: 'json' }
 import {login, logout} from '../src/libs/auth.mjs'
-import { caputre } from '../src/libs/action.mjs'
+import { caputre, tracking } from '../src/libs/action.mjs'
+
+if (!fs.existsSync('./logs')) {
+  fs.mkdirSync('./logs')
+}
 
 program
   .version(pckg.version)
@@ -21,6 +26,13 @@ program
 program
   .command('capture <url>')
   .description('')
+  .option('--timeout <ms>', 'Set timeout in millisecond', 6000)
   .action(caputre)
 
+program
+  .command('tracking')
+  .description('')
+  .option('--timeout <ms>', 'Set timeout in millisecond', 6000)
+  .option('--intervals <ms>', 'Set intervals time in millisecond', 3600000)
+  .action(tracking)
 program.parse(process.argv)
