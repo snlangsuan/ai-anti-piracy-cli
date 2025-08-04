@@ -6,7 +6,7 @@ async function chkToken(token) {
   try {
     const instance = useHttpInstance(token)
     const res = await instance.get('/domains/policies', { params: { type: 'BLACKLIST', page: 1, limit: 1 } })
-    return res.data?.items?.length > 0
+    return res.status === 200
   } catch (error) {
     console.log(chalk.red(`[error] ${error.message}`))
   }

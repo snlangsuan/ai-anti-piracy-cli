@@ -27,6 +27,7 @@ program
   .command('capture <url>')
   .description('')
   .option('--timeout <ms>', 'Set timeout in millisecond', 6000)
+  .option('--chrome-socket <endpoint>', 'Set chrome web socket debugger URL')
   .action(caputre)
 
 program
@@ -34,5 +35,6 @@ program
   .description('')
   .option('--timeout <ms>', 'Set timeout in millisecond', 6000)
   .option('--intervals <ms>', 'Set intervals time in millisecond', 3600000)
+  .option('--chrome-socket <endpoint>', 'Set chrome web socket debugger URL')
   .action(tracking)
 program.parse(process.argv)
