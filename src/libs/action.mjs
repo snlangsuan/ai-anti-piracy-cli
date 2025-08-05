@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer'
+import puppeteer, { TimeoutError } from 'puppeteer'
 import UserAgent from 'user-agents'
 import { getAppToken } from './api.mjs'
 import chalk from 'chalk'
@@ -53,7 +53,7 @@ async function getCapture(url, options) {
     await page.screenshot({ path: `./logs/${filename}` })
     return [null, `./logs/${filename}`]
   } catch (error) {
-    if (error instanceof puppeteer.TimeoutError) {
+    if (error instanceof TimeoutError) {
       return ['CAPTIMEOUT', null]
     }
     return ['CAPUNKNOWNERROR', null]
@@ -159,6 +159,8 @@ async function startTracking(options) {
     console.log(chalk.red('[error] Failed to get ISP'))
     return
   }
+
+  console.log('')
 
   const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
   try {
