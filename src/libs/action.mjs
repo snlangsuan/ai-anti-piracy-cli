@@ -173,7 +173,7 @@ async function startTracking(options) {
         url: ds.url,
         client_ip: ipaddr,
         hostname: ds.hostname,
-        network: isp,
+        network: isp.trim(),
         is_resolvable: accessed,
       }
       if (code) result.error = code
