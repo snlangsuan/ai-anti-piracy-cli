@@ -16,6 +16,7 @@ program
 program
   .command('login <token>')
   .description('Login and save the App Token')
+  .option('--base-api <url>', 'Set base API URL', 'https://apai-api.jts.co.th/api/v1')
   .action(login)
 
 program
@@ -28,6 +29,7 @@ program
   .description('')
   .option('--timeout <ms>', 'Set timeout in millisecond', 6000)
   .option('--chrome-socket <endpoint>', 'Set chrome web socket debugger URL')
+  .option('--no-headless', 'Run in headless mode')
   .action(caputre)
 
 program
@@ -36,5 +38,7 @@ program
   .option('--timeout <ms>', 'Set timeout in millisecond', 6000)
   .option('--intervals <ms>', 'Set intervals time in millisecond', 3600000)
   .option('--chrome-socket <endpoint>', 'Set chrome web socket debugger URL')
+  .option('--base-api <url>', 'Set base API URL', 'https://apai-api.jts.co.th/api/v1')
+  .option('--no-headless', 'Run in headless mode')
   .action(tracking)
 program.parse(process.argv)

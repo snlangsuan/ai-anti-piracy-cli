@@ -11,6 +11,7 @@ import cliProgress from 'cli-progress'
 import * as cheerio from 'cheerio'
 import fs from 'node:fs'
 import dayjs from 'dayjs'
+import Table from 'cli-table3'
 
 dns.setDefaultResultOrder('ipv4first')
 
@@ -23,7 +24,7 @@ async function getCapture(url, options) {
     const randomUserAgent = userAgent.toString()
     const puppeteerOptions = {
       ignoreHTTPSErrors: true,
-      headless: true,
+      headless: options.headless,
       args: [
         '--ignore-certificate-errors',
         '--no-sandbox',
@@ -62,11 +63,11 @@ async function getCapture(url, options) {
   }
 }
 
-async function getDomain(token) {
+async function getDomain(token, baseApi) {
   let total = 0
   let page = 1
   const urls = []
-  const instance = useHttpInstance(token)
+  const instance = useHttpInstance(token, baseApi)
   while (true) {
     const res = await instance.get('/domains/policies', {
       params: { type: 'BLACKLIST', page, limit: 100, sort: 'created_at', desc: true },
@@ -76,6 +77,7 @@ async function getDomain(token) {
     page += 1
     if (urls.length >= total) break
   }
+  console.log('get domain')
   return urls
 }
 
@@ -121,8 +123,8 @@ async function checkAccess(url, timeout) {
   }
 }
 
-async function addLog(data, token) {
-  const instance = useHttpInstance(token)
+async function addLog(data, token, baseApi) {
+  const instance = useHttpInstance(token, baseApi)
   try {
     const { screenshot, ...urls } = data
     const transaction = await instance.post('/domains/checks', { urls: [urls] })
@@ -160,12 +162,13 @@ async function startTracking(options) {
     return
   }
 
-  console.log('')
+  console.log('IP Address:', ipaddr)
+  console.log('ISP:', isp, '\n')
 
+  const table = new Table({ head: ['URL', 'Network', 'Status', 'Status Code'], colWidths: [40, 30, 10, 20] })
   const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
   try {
-    const domains = await getDomain(token)
-    // const data = []
+    const domains = await getDomain(token, options.baseApi)
     bar1.start(domains.length, 0)
     for (const ds of domains) {
       const [accessed, code] = await checkAccess(ds.url, options.timeout)
@@ -186,23 +189,29 @@ async function startTracking(options) {
           result.screenshot = file
         }
       }
-      await addLog(result, token)
+      table.push([result.hostname, result.network, result.is_resolvable ? 'resolved' : 'failed', result.error])
+      await addLog(result, token, options.baseApi)
       bar1.increment()
     }
   } catch (error) {
-    console.log(error)
+    // console.log(error)
+    if (error.response && error.response.status === 401) return console.error(chalk.red('[error] Invalid app token'))
+    console.error(chalk.red('[error] Something went wrong'))
   } finally {
     bar1.stop()
     console.log('\n')
   }
 
-  timeout = setTimeout(startTracking, options.intervals)
+  timeout = setTimeout(() => startTracking(options), options.intervals)
+  console.log('\n')
+  console.log(table.toString())
+  console.log('\n')
   console.log('next time:', dayjs().add(options.intervals, 'ms').format('YYYY-MM-DD HH:mm:ss'))
 }
 
 export const caputre = async (url, options) => {
   const file = await getCapture(url, options)
-  console.log(file)
+  console.log(chalk.green('[info] Done.'))
 }
 
 export const tracking = async (options) => {

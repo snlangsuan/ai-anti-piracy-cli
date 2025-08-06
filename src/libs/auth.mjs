@@ -2,9 +2,9 @@ import chalk from 'chalk'
 import { useHttpInstance } from './http.instance.mjs'
 import { setAppToken } from './api.mjs'
 
-async function chkToken(token) {
+async function chkToken(token, baseApi) {
   try {
-    const instance = useHttpInstance(token)
+    const instance = useHttpInstance(token, baseApi)
     const res = await instance.get('/domains/policies', { params: { type: 'BLACKLIST', page: 1, limit: 1 } })
     return res.status === 200
   } catch (error) {
@@ -12,12 +12,12 @@ async function chkToken(token) {
   }
 }
 
-export const login = async (token) => {
+export const login = async (token, options) => {
   if (!token) {
     console.log(chalk.red('[error] Please provide your token.'))
     return
   }
-  const res = await chkToken(token)
+  const res = await chkToken(token, options.baseApi)
   if (res) {
     setAppToken(token)
     console.log(chalk.green('[info] Login successful! Your token has been stored securely.'))

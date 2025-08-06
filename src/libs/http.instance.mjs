@@ -2,9 +2,9 @@ import { BASE_API_URL } from '../constants.mjs'
 import axios from 'axios'
 import https from 'node:https'
 
-export const useHttpInstance = (token) => {
+export const useHttpInstance = (token, baseUrl) => {
   const instance = new axios.create({
-    baseURL: BASE_API_URL,
+    baseURL: baseUrl ?? BASE_API_URL,
     httpsAgent: new https.Agent({
       rejectUnauthorized: false,
     }),
