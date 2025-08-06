@@ -36,7 +36,7 @@ program
   .command('tracking')
   .description('')
   .option('--timeout <ms>', 'Set timeout in millisecond', 6000)
-  .option('--intervals <ms>', 'Set intervals time in millisecond', 3600000)
+  .option('--intervals <ms>', 'Set intervals time in millisecond')
   .option('--chrome-socket <endpoint>', 'Set chrome web socket debugger URL')
   .option('--base-api <url>', 'Set base API URL', 'https://apai-api.jts.co.th/api/v1')
   .option('--no-headless', 'Run in headless mode')

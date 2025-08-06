@@ -77,7 +77,6 @@ async function getDomain(token, baseApi) {
     page += 1
     if (urls.length >= total) break
   }
-  console.log('get domain')
   return urls
 }
 
@@ -202,10 +201,11 @@ async function startTracking(options) {
     console.log('\n')
   }
 
-  timeout = setTimeout(() => startTracking(options), options.intervals)
   console.log('\n')
   console.log(table.toString())
   console.log('\n')
+  if (!options.intervals) return
+  timeout = setTimeout(() => startTracking(options), options.intervals)
   console.log('next time:', dayjs().add(options.intervals, 'ms').format('YYYY-MM-DD HH:mm:ss'))
 }
 
