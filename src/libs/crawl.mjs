@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import dayjs from 'dayjs'
+import dayjs from 'dayjs1'
 import puppeteer from 'puppeteer'
 import UserAgent from 'user-agents'
 
