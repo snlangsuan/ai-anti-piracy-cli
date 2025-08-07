@@ -12,12 +12,13 @@ import * as cheerio from 'cheerio'
 import fs from 'node:fs'
 import dayjs from 'dayjs'
 import Table from 'cli-table3'
+import tempfile from 'tempfile'
 
 dns.setDefaultResultOrder('ipv4first')
 
 let timeout = null
 
-async function getCapture(url, options) {
+async function getCapture(url, options, isMain = true) {
   let browser = null
   try {
     const userAgent = new UserAgent({ deviceCategory: 'desktop' })
@@ -47,12 +48,14 @@ async function getCapture(url, options) {
     }
     browser = await puppeteer.launch(puppeteerOptions)
     const page = await browser.newPage()
-    page.setViewport({ width: 1920, height: 1080 })
+    page.setViewport({ width: 1280, height: 720 })
     await page.setUserAgent(randomUserAgent)
-    const filename = `img_${Date.now()}.png`
+    // const filename = `img_${Date.now()}.png`
+    const filename = isMain && 'dir' in options ? `${options.dir}/img_${Date.now()}.png` : isMain ? `img_${Date.now()}.png` :  tempfile({extension: 'png'})
     await page.goto(url, { timeout: options.timeout })
-    await page.screenshot({ path: `./logs/${filename}` })
-    return [null, `./logs/${filename}`]
+    await page.screenshot({ path: filename })
+    console.log(filename)
+    return [null, filename]
   } catch (error) {
     if (error instanceof TimeoutError) {
       return ['CAPTIMEOUT', null]
@@ -180,7 +183,7 @@ async function startTracking(options) {
       }
       if (code) result.error = code
       if (accessed) {
-        const [capError, file] = await getCapture(ds.url, options)
+        const [capError, file] = await getCapture(ds.url, options, false)
         if (capError) {
           result.error = capError
           result.is_resolvable = false

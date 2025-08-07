@@ -5,6 +5,7 @@ import { program } from 'commander'
 import pckg from './../package.json' with { type: 'json' }
 import {login, logout} from '../src/libs/auth.mjs'
 import { caputre, tracking } from '../src/libs/action.mjs'
+import { crawl } from '../src/libs/crawl.mjs'
 
 if (!fs.existsSync('./logs')) {
   fs.mkdirSync('./logs')
@@ -30,6 +31,7 @@ program
   .option('--timeout <ms>', 'Set timeout in millisecond', 6000)
   .option('--chrome-socket <endpoint>', 'Set chrome web socket debugger URL')
   .option('--no-headless', 'Run in headless mode')
+  .option('--dir <path>', 'Set output directory')
   .action(caputre)
 
 program
@@ -41,4 +43,15 @@ program
   .option('--base-api <url>', 'Set base API URL', 'https://apai-api.jts.co.th/api/v1')
   .option('--no-headless', 'Run in headless mode')
   .action(tracking)
+
+program
+  .command('crawl <url>')
+  .description('')
+  .option('--timeout <ms>', 'Set timeout in millisecond', 60000)
+  .option('-d, --max-depth <number>', 'Set max depth', 2)
+  .option('-k --keyword <keyword...>', 'Filter by keyword')
+  .option('--no-headless', 'Run in headless mode')
+  .option('-c --concurrency <number>', 'Set number of worker', 1)
+  .action(crawl)
+
 program.parse(process.argv)
